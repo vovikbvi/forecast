@@ -13,7 +13,6 @@ import com.bogdevich.forecast.dataaccess.AbstractDao;
 import com.bogdevich.forecast.dataaccess.filter.AbstractFilter;
 import com.bogdevich.forecast.datamodel.AbstractModel;
 
-
 public abstract class AbstractDaoImpl<T, ID, F> implements AbstractDao<T, ID, F> {
 
 	@PersistenceContext
@@ -53,11 +52,11 @@ public abstract class AbstractDaoImpl<T, ID, F> implements AbstractDao<T, ID, F>
 
 	@Override
 	public void delete(ID id) {
-		
-			entityManager.createQuery(String.format("delete from %s e where e.id = :id", entityClass.getSimpleName()))
-			.setParameter("id", id).executeUpdate();
+
+		entityManager.createQuery(String.format("delete from %s e where e.id = :id", entityClass.getSimpleName()))
+				.setParameter("id", id).executeUpdate();
 	}
-	
+
 	public Class<T> getEntityClass() {
 		return entityClass;
 	}
@@ -66,23 +65,23 @@ public abstract class AbstractDaoImpl<T, ID, F> implements AbstractDao<T, ID, F>
 		return entityManager;
 	}
 
-    protected void setPaging(AbstractFilter filter, TypedQuery<? extends AbstractModel> q) {
-        if (filter.getOffset() != null && filter.getLimit() != null) {
-            q.setFirstResult(filter.getOffset());
-            q.setMaxResults(filter.getLimit());
-        }
-    }
+	protected void setPaging(AbstractFilter filter, TypedQuery<? extends AbstractModel> q) {
+		if (filter.getOffset() != null && filter.getLimit() != null) {
+			q.setFirstResult(filter.getOffset());
+			q.setMaxResults(filter.getLimit());
+		}
+	}
 
-    abstract void handleFilterParameters(F filter, CriteriaBuilder cb, CriteriaQuery<?> cq, Root<T> from);
-    
+	abstract void handleFilterParameters(F filter, CriteriaBuilder cb, CriteriaQuery<?> cq, Root<T> from);
+
 	@Override
 	public Long count(F filter) {
-		
+
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 		Root<T> from = cq.from(entityClass);
 		cq.select(cb.count(from));
-		
+
 		handleFilterParameters(filter, cb, cq, from);
 		TypedQuery<Long> q = entityManager.createQuery(cq);
 		Long result = q.getSingleResult();
